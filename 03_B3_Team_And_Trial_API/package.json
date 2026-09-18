@@ -1,0 +1,16 @@
+{
+  "name": "03_sniffing_and_api",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "find_buttons.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "puppeteer-core": "^25.11.0"
+  }
+}

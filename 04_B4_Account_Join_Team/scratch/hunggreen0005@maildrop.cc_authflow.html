@@ -1,0 +1,208 @@
+<body class="body-styles">
+    <div class="container">
+      <div class="main">
+        <div class="flex justify-center">
+          <img src="https://identity-assets.getpostman.com/images/logo-postman.svg" alt="Postman Logo">
+        </div>
+        <div id="pmCard" class="card wd-4">
+          <h1 class="heading-2 text-center spacing-bottom-l">
+            Continue using Postman
+          </h1>
+            <p class="text-medium text-subdued  text-center spacing-bottom-l">
+              To join akimax10, sign in with one of the accounts below.
+            </p>
+          <div id="account_select_container">
+
+            
+                <div class="pm-no-team-account"></div>
+                <a class="flex align-center entity pm-card-account" href="/accounts/auth/748Xq?email=hunggreen0005%40maildrop.cc&amp;user_id=58299524&amp;authFlowId=5bdace40-732f-49f3-ae12-d3a670354e4e" data-testid="account-chooser-non-team-hunggreen0005-sections">
+                  <div class="loaderContainer"><div id="aetherLoader">
+  <span></span>
+  <span></span>
+  <span></span>
+</div>
+</div>
+                  <div class="pm-icon-user pm-icon-sm pm-icon-user-4 pm-icon-user-color-10 spacing-right-m">
+                    
+                  </div>
+                  <div class="pm-icon-pass"></div>
+                  <div class="user-details wd-80">
+                      <h3 title="5" class="heading-5 text-dark truncate-text name">5</h3>
+                      <div title="hunggreen0005@maildrop.cc" class="text-subdued truncate-text email">hunggreen0005@maildrop.cc</div>
+                  </div>
+                </a>
+              <div class="pm-user-divider"></div>
+          </div>
+            <a class="flex align-center entity pm-card-add-account spacing-top-xxl" href="https://identity.getpostman.com/login?addAccount=1&amp;cta=join-team&amp;invite_code=28a93c3b8cd086bd3f10ca8ad5bcac591609ae7a08d42e4f2dc6f2a459118121&amp;continue=https%3A%2F%2Fapp.getpostman.com%2Fweb-invite-accept%3Finvite_code%3D28a93c3b8cd086bd3f10ca8ad5bcac591609ae7a08d42e4f2dc6f2a459118121&amp;authFlowId=5bdace40-732f-49f3-ae12-d3a670354e4e">
+              <div class="spacing-right-m pm-icon-add-alt pm-icon-sm"></div>
+              <div class="text-dark truncate-text info">Sign in with a different account</div>
+            </a>
+        </div>
+      </div>
+      <footer id="footer" class="footer">
+          <div class="flex justify-center">
+            <ul class="language-list" id="langsList"><li lang="en-US" title="Current language: English" class="active"><a href="https://identity.getpostman.com/accounts?cta=join-team&amp;invite_code=28a93c3b8cd086bd3f10ca8ad5bcac591609ae7a08d42e4f2dc6f2a459118121&amp;continue=https%3A%2F%2Fapp.getpostman.com%2Fweb-invite-accept%3Finvite_code%3D28a93c3b8cd086bd3f10ca8ad5bcac591609ae7a08d42e4f2dc6f2a459118121&amp;authFlowId=5bdace40-732f-49f3-ae12-d3a670354e4e&amp;lang=en-US">English</a></li><li lang="ja" title="Use Postman in 日本語"><a href="https://identity.getpostman.com/accounts?cta=join-team&amp;invite_code=28a93c3b8cd086bd3f10ca8ad5bcac591609ae7a08d42e4f2dc6f2a459118121&amp;continue=https%3A%2F%2Fapp.getpostman.com%2Fweb-invite-accept%3Finvite_code%3D28a93c3b8cd086bd3f10ca8ad5bcac591609ae7a08d42e4f2dc6f2a459118121&amp;authFlowId=5bdace40-732f-49f3-ae12-d3a670354e4e&amp;lang=ja">日本語</a></li></ul>
+          </div>
+          <script nonce="">
+               const i18nParam = 'lang',
+                 href = new URL(window.location.href),
+                 params = new URLSearchParams(href.search);
+          
+              function generateLanguageList(langsList, activeLang) {
+                  const langItems = langsList.map((langObj) => {
+                      const langCode = Object.keys(langObj)[0];
+                      const langName = langObj[langCode];
+                      const isActive = langCode === activeLang;
+                      const title = isActive ? `Current language: ${langName}` : `Use Postman in ${langName}`;
+                      params.set(i18nParam, langCode);
+                      href.search = params.toString();
+          
+                      return `<li  lang="${langCode}" title="${title}" ${isActive ? ' class="active"' : ''}><a  href="${href}">${langName}</a></li>`;
+                  });
+          
+            return langItems.join('');
+          }
+          
+              const langsList = [
+                  { 'en-US': "English" },
+                  { 'ja': "日本語" }
+              ];
+          
+              const activeLang = 'en-US';
+              document.querySelector('#langsList').innerHTML = generateLanguageList(langsList, activeLang);
+          
+          </script>
+        <span translate="no" class="text-subdued">©2025 Postman, Inc. All rights reserved.</span>
+          <i class="separator">·</i>
+          <a class="link-muted" href="https://www.postman.com/legal/eula" target="_blank">Terms of use</a>
+          <i class="separator">·</i>
+          <a class="link-muted" href="https://www.postman.com/legal/privacy-policy" target="_blank">Privacy policy</a>
+      </footer>
+      
+        <script nonce="">
+          (function () {
+            const authFlowId = '5bdace40-732f-49f3-ae12-d3a670354e4e';
+            if (!authFlowId || !window.history || !window.history.replaceState) return;
+        
+            try {
+              // --- 1. Update current page URL ---
+              const url = new URL(window.location.href);
+              const params = url.searchParams;
+        
+              if (params.get('authFlowId') !== authFlowId) {
+                params.set('authFlowId', authFlowId);
+                url.search = params.toString();
+                window.history.replaceState({ authFlowId }, document.title, url.toString());
+              }
+        
+              // --- 2. Update all anchor hrefs on the page ---
+              window.addEventListener('DOMContentLoaded', () => {
+                document.querySelectorAll('a[href]').forEach(anchor => {
+                  // Skip anchors to external hosts that should preserve their absolute URL
+                  if (anchor.getAttribute('rel') === 'external') return;
+        
+                  const href = anchor.getAttribute('href');
+                  if (!href ||
+                    href.startsWith('#') ||
+                    href.startsWith('javascript:') ||
+                    href.startsWith('data:') ||
+                    href.startsWith('vbscript:') ||
+                    href.startsWith('mailto:') ||
+                    href.startsWith('tel:')
+                  ) return;
+        
+                  try {
+                    const linkUrl = new URL(href, window.location.origin);
+                    if (!linkUrl.searchParams.has('authFlowId') && linkUrl.origin === window.location.origin) {
+                      linkUrl.searchParams.set('authFlowId', authFlowId);
+                      anchor.setAttribute('href', linkUrl.pathname + linkUrl.search + linkUrl.hash);
+                    }
+                  } catch(e) {
+                    console.log("Skipping invalid URL: ", href, e);
+                  }
+                });
+              });
+        
+              // --- 3. Intercept all XHR calls and append authFlowId ---
+              (function() {
+                const origOpen = XMLHttpRequest.prototype.open;
+        
+                XMLHttpRequest.prototype.open = function(method, url, async) {
+                  try {
+                    let fullUrl = url;
+        
+                    if (authFlowId && !fullUrl.includes('authFlowId=')) {
+                      const sep = fullUrl.includes('?') ? '&' : '?';
+                      fullUrl += sep + 'authFlowId=' + encodeURIComponent(authFlowId);
+                    }
+        
+                    return origOpen.call(this, method, fullUrl, async);
+                  } catch (err) {
+                    console.error("XHR interceptor error:", err);
+                    return origOpen.apply(this, arguments);
+                  }
+                };
+              })();
+        
+            } catch (e) {
+              console.error('Failed to update URL or hrefs with authFlowId: ', e);
+            }
+          })();
+        </script>
+    </div>
+     <script nonce="">
+
+
+			let timerId, loader, accountsContainer;
+
+      function resetLoaderState(){
+        clearTimeout(timerId);
+        timerId = null;
+        accountsContainer.removeClass('disabled');
+        loader.style.display = 'none';
+      }
+
+			function handleCardClick(e) {
+					const currentTarget = e.currentTarget;
+					if (currentTarget.tagName.toLowerCase() !== 'a') return;
+
+          accountsContainer = DOMUtils.select('#account_select_container');
+					loader = currentTarget.querySelector('.loaderContainer');
+
+					loader.style.display = 'block';
+          accountsContainer.addClass('disabled');
+
+					if (timerId) clearTimeout(timerId);
+					timerId = setTimeout(() => {
+              resetLoaderState();
+              analytics.recordEvent({
+                action: 'initiate_select_timedout',
+                label: 'account_select'
+              });
+					}, 10000);
+
+          analytics.recordEvent({
+            action: 'initiate_select_account',
+            label: 'account_select'
+          });
+			}
+
+			DOMUtils.on('.pm-card-account', 'click', handleCardClick);
+      DOMUtils.on('.pm-card-add-account', 'click', (e) => {
+        analytics.recordEvent({
+          action: 'initiate_add_new_account',
+          label: 'account_select'
+        });
+      });
+
+
+      window.addEventListener('pageshow', (e) => {
+				if (e.persisted) { resetLoaderState() }
+			});
+
+      analytics.recordEvent({action: 'select_account_landing', label: 'account_select' });
+
+    </script>
+  
+
+</body>

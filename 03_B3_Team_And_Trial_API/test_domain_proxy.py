@@ -1,0 +1,33 @@
+import requests
+from create_and_upgrade_team import extract_profile_cookies
+
+profile_path = "/home/dev/ChromeProfiles/hunggreen0001@maildrop.cc"
+cookies = extract_profile_cookies(profile_path)
+allowed_cookies = ["postman.sid", "_pm.store", "postman.sst", "postman.ssid"]
+session = requests.Session()
+for k, v in cookies.items():
+    if k in allowed_cookies:
+        session.cookies.set(k, v, domain=".postman.co")
+
+session.headers.update({
+    "User-Agent": "PostmanDesktop/12.26.5 (Linux x86_64)",
+    "Content-Type": "application/json",
+    "Accept": "application/json"
+})
+
+org_id = "42977088"
+domain = "gold-sunset-847124"
+url = f"https://{domain}.postman.co/_api/ws/proxy"
+
+payload = {
+    "path": f"/api/organizations/{org_id}/limited-duration-trial",
+    "method": "POST",
+    "service": "billing",
+    "body": {
+        "tier": "enterprise_202603",
+        "trial_type": "client_enterprise_7_days_trial"
+    }
+}
+res = session.post(url, json=payload)
+print(res.status_code, res.text)
+

@@ -1,0 +1,194 @@
+[
+  {
+    "team": "Team 1",
+    "account": "hunggreen0002@maildrop.cc",
+    "success": false,
+    "reason": "timeout"
+  },
+  {
+    "team": "Team 2",
+    "account": "hunggreen0002@maildrop.cc",
+    "success": true,
+    "reason": "joined"
+  },
+  {
+    "team": "Team 3",
+    "account": "hunggreen0002@maildrop.cc",
+    "success": true,
+    "reason": "joined"
+  },
+  {
+    "team": "Team 4",
+    "account": "hunggreen0002@maildrop.cc",
+    "success": true,
+    "reason": "joined"
+  },
+  {
+    "team": "Team 5",
+    "account": "hunggreen0002@maildrop.cc",
+    "success": true,
+    "reason": "joined"
+  },
+  {
+    "team": "Team 6",
+    "account": "hunggreen0002@maildrop.cc",
+    "success": true,
+    "reason": "joined"
+  },
+  {
+    "team": "Team 7",
+    "account": "hunggreen0002@maildrop.cc",
+    "success": false,
+    "reason": "timeout"
+  },
+  {
+    "team": "Team 8",
+    "account": "hunggreen0002@maildrop.cc",
+    "success": true,
+    "reason": "joined"
+  },
+  {
+    "team": "Team 1",
+    "account": "hunggreen0003@maildrop.cc",
+    "success": true,
+    "reason": "joined"
+  },
+  {
+    "team": "Team 2",
+    "account": "hunggreen0003@maildrop.cc",
+    "success": true,
+    "reason": "joined"
+  },
+  {
+    "team": "Team 3",
+    "account": "hunggreen0003@maildrop.cc",
+    "success": true,
+    "reason": "joined"
+  },
+  {
+    "team": "Team 4",
+    "account": "hunggreen0003@maildrop.cc",
+    "success": true,
+    "reason": "joined"
+  },
+  {
+    "team": "Team 5",
+    "account": "hunggreen0003@maildrop.cc",
+    "success": true,
+    "reason": "joined"
+  },
+  {
+    "team": "Team 6",
+    "account": "hunggreen0003@maildrop.cc",
+    "success": true,
+    "reason": "joined"
+  },
+  {
+    "team": "Team 7",
+    "account": "hunggreen0003@maildrop.cc",
+    "success": true,
+    "reason": "joined"
+  },
+  {
+    "team": "Team 8",
+    "account": "hunggreen0003@maildrop.cc",
+    "success": true,
+    "reason": "joined"
+  },
+  {
+    "team": "Team 1",
+    "account": "hunggreen0004@maildrop.cc",
+    "success": true,
+    "reason": "joined"
+  },
+  {
+    "team": "Team 2",
+    "account": "hunggreen0004@maildrop.cc",
+    "success": true,
+    "reason": "joined"
+  },
+  {
+    "team": "Team 3",
+    "account": "hunggreen0004@maildrop.cc",
+    "success": true,
+    "reason": "joined"
+  },
+  {
+    "team": "Team 4",
+    "account": "hunggreen0004@maildrop.cc",
+    "success": true,
+    "reason": "joined"
+  },
+  {
+    "team": "Team 5",
+    "account": "hunggreen0004@maildrop.cc",
+    "success": true,
+    "reason": "joined"
+  },
+  {
+    "team": "Team 6",
+    "account": "hunggreen0004@maildrop.cc",
+    "success": true,
+    "reason": "joined"
+  },
+  {
+    "team": "Team 7",
+    "account": "hunggreen0004@maildrop.cc",
+    "success": true,
+    "reason": "joined"
+  },
+  {
+    "team": "Team 8",
+    "account": "hunggreen0004@maildrop.cc",
+    "success": true,
+    "reason": "joined"
+  },
+  {
+    "team": "Team 1",
+    "account": "hunggreen0005@maildrop.cc",
+    "success": false,
+    "reason": "timeout"
+  },
+  {
+    "team": "Team 2",
+    "account": "hunggreen0005@maildrop.cc",
+    "success": true,
+    "reason": "joined"
+  },
+  {
+    "team": "Team 3",
+    "account": "hunggreen0005@maildrop.cc",
+    "success": true,
+    "reason": "joined"
+  },
+  {
+    "team": "Team 4",
+    "account": "hunggreen0005@maildrop.cc",
+    "success": true,
+    "reason": "joined"
+  },
+  {
+    "team": "Team 5",
+    "account": "hunggreen0005@maildrop.cc",
+    "success": true,
+    "reason": "joined"
+  },
+  {
+    "team": "Team 6",
+    "account": "hunggreen0005@maildrop.cc",
+    "success": true,
+    "reason": "joined"
+  },
+  {
+    "team": "Team 7",
+    "account": "hunggreen0005@maildrop.cc",
+    "success": true,
+    "reason": "joined"
+  },
+  {
+    "team": "Team 8",
+    "account": "hunggreen0005@maildrop.cc",
+    "success": true,
+    "reason": "joined"
+  }
+]

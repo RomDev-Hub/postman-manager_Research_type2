@@ -1,0 +1,9 @@
+*Profiles*/
+ChromeProfiles/
+EdgeProfiles/
+Tmp/
+.DS_Store
+node_modules/
+.env*
+__pycache__/
+*.pyc

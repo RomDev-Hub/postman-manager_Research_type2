@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Postman Automator Web UI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        .log-container { height: 300px; overflow-y: auto; background-color: #1e1e1e; color: #d4d4d4; font-family: monospace; }
+        .log-entry { padding: 2px 4px; border-bottom: 1px solid #333; word-break: break-all; }
+        .log-tag-Input { color: #569cd6; }
+        .log-tag-Output { color: #4ec9b0; }
+        .log-tag-Process { color: #c586c0; }
+        .log-tag-Err { color: #f44747; }
+        .log-tag-Bug { color: #f48771; }
+        .log-tag-Warn { color: #d7ba7d; }
+        .log-tag-API { color: #ce9178; }
+    </style>
+</head>
+<body class="bg-gray-100 h-screen flex overflow-hidden">
+    <div id="app" class="w-full flex">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-slate-800 text-white flex flex-col">
+            <div class="p-4 bg-slate-900 text-xl font-bold border-b border-slate-700">Postman Auto</div>
+            <nav class="flex-1 overflow-y-auto p-4 space-y-2">
+                <button @click="currentStep = 'dashboard'" :class="{'bg-blue-600': currentStep === 'dashboard'}" class="w-full text-left px-4 py-2 rounded hover:bg-slate-700">Dashboard & Settings</button>
+                <button @click="currentStep = 'b1'" :class="{'bg-blue-600': currentStep === 'b1'}" class="w-full text-left px-4 py-2 rounded hover:bg-slate-700">B1: Create Accounts</button>
+                <button @click="currentStep = 'b2'" :class="{'bg-blue-600': currentStep === 'b2'}" class="w-full text-left px-4 py-2 rounded hover:bg-slate-700">B2: Profile Manager & Auto Login</button>
+                <button @click="currentStep = 'b3'" :class="{'bg-blue-600': currentStep === 'b3'}" class="w-full text-left px-4 py-2 rounded hover:bg-slate-700">B3: Team Management</button>
+                <button @click="currentStep = 'b4'" :class="{'bg-blue-600': currentStep === 'b4'}" class="w-full text-left px-4 py-2 rounded hover:bg-slate-700">B4: Join Teams</button>
+                <button @click="currentStep = 'b6'" :class="{'bg-blue-600': currentStep === 'b6'}" class="w-full text-left px-4 py-2 rounded hover:bg-slate-700">B6: Team Cleanup</button>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 flex flex-col h-screen overflow-hidden">
+            <!-- Header/Content Area -->
+            <div class="flex-1 overflow-y-auto p-8">
+                
+                <!-- Dashboard -->
+                <div v-if="currentStep === 'dashboard'">
+                    <h2 class="text-2xl font-bold mb-4">Dashboard & Settings</h2>
+                    <div class="bg-white p-6 rounded shadow max-w-2xl">
+                        <div class="mb-4">
+                            <label class="block text-gray-700 font-bold mb-2">Browser</label>
+                            <select v-model="settings.browser" @change="saveSettings" class="w-full p-2 border rounded">
+                                <option value="chrome">Google Chrome (Linux/Windows default)</option>
+                                <option value="edge">Microsoft Edge</option>
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 font-bold mb-2">Concurrency (Số luồng mở đồng thời)</label>
+                            <input type="number" v-model.number="settings.concurrency" @change="saveSettings" class="w-full p-2 border rounded" min="1" max="20">
+                            <p class="text-sm text-gray-500 mt-1">Lưu ý: Mở quá nhiều cửa sổ có thể gây lag máy hoặc bị block captcha.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- B1 -->
+                <div v-if="currentStep === 'b1'">
+                    <h2 class="text-2xl font-bold mb-4">B1: Auto Create Accounts</h2>
+                    <div class="bg-white p-6 rounded shadow max-w-2xl">
+                        <div class="mb-4">
+                            <label class="block text-gray-700 font-bold mb-2">Số lượng tài khoản cần tạo</label>
+                            <input v-model.number="b1.count" type="number" class="w-full p-2 border rounded" min="1" max="100">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 font-bold mb-2">Tiền tố Email (VD: testuser)</label>
+                            <input v-model="b1.prefix" type="text" class="w-full p-2 border rounded" placeholder="testuser">
+                        </div>
+                        <div class="flex justify-end">
+                            <button @click="runB1" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Bắt đầu tạo (Stub)</button>
+                        </div>
+                        <p class="text-gray-600 mt-4 italic">[Tính năng tạo tự động đang được thiết kế (Reserved for Future). Nút bấm hiện tại chỉ để test luồng UI.]</p>
+                    </div>
+                </div>
+
+                <!-- B2 -->
+                <div v-if="currentStep === 'b2'" class="h-full flex flex-col">
+                    <h2 class="text-2xl font-bold mb-4">B2: Profile Manager & Batch Auto Login</h2>
+                    <div class="flex-1 flex gap-4 h-full">
+                        <!-- Left: Input & Controls -->
+                        <div class="w-1/4 bg-white p-4 rounded shadow flex flex-col">
+                            <div class="flex gap-2 mb-2 flex-wrap">
+                                <button v-if="!isRunningB2" @click="startBatchLogin" class="flex-1 bg-green-600 text-white px-2 py-1 rounded hover:bg-green-700 text-sm">Khởi chạy</button>
+                                <button v-if="isRunningB2 && !isPausedB2" @click="pauseBatchLogin" class="flex-1 bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600 text-sm">Tạm dừng</button>
+                                <button v-if="isRunningB2 && isPausedB2" @click="resumeBatchLogin" class="flex-1 bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-sm">Tiếp tục</button>
+                                <button @click="stopBatchLogin" :disabled="!isRunningB2" class="flex-1 bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700 disabled:opacity-50 text-sm">Hủy</button>
+                            </div>
+                            <label class="block text-gray-700 font-bold mb-1 mt-2 text-xs">Nhập danh sách Email (mỗi dòng 1 email)</label>
+                            <textarea v-model="b2.emails" class="w-full flex-1 p-2 border rounded font-mono text-sm" placeholder="user1@maildrop.cc&#10;user2@maildrop.cc"></textarea>
+                        </div>
+                        
+                        <!-- Right: Audit System -->
+                        <div class="w-3/4 bg-white p-4 rounded shadow flex flex-col">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="font-bold">Trạng thái Profiles</h3>
+                                <button @click="scanProfiles" :disabled="isScanningB2" class="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700 disabled:opacity-50">
+                                    {{ isScanningB2 ? 'Đang quét...' : 'Quét Lại (Scan)' }}
+                                </button>
+                            </div>
+                            <div class="flex-1 overflow-y-auto p-2">
+                                <div v-if="b2.auditList.length === 0" class="text-center text-gray-500 mt-4">
+                                    Chưa có dữ liệu quét. Nhập email bên trái và nhấn "Quét Lại".
+                                </div>
+                                <div v-else class="grid grid-cols-2 gap-3">
+                                    <div v-for="p in b2.auditList" :key="p.email" class="border rounded p-3 flex items-center justify-between shadow-sm bg-gray-50 hover:bg-gray-100 transition-colors">
+                                        <div class="font-mono text-sm font-bold text-gray-800 truncate mr-2" :title="p.email">{{ p.email }}</div>
+                                        <div class="flex items-center gap-2 flex-shrink-0">
+                                            <span v-if="p.status === 'OK'" class="text-green-600 font-bold text-[11px] min-w-[80px] text-right">✅ OK</span>
+                                            <span v-else-if="p.status === 'EXPIRED'" class="text-red-600 font-bold text-[11px] min-w-[80px] text-right">❌ Hết phiên</span>
+                                            <span v-else-if="p.status === 'CHECKING'" class="text-yellow-600 font-bold text-[11px] min-w-[80px] text-right">⏳ Đang check</span>
+                                            <span v-else class="text-gray-500 text-[11px] min-w-[80px] text-right">➖ Chưa rõ</span>
+                                            
+                                            <button @click="openProfile(p.email)" class="bg-indigo-500 text-white px-2 py-1 rounded text-[11px] hover:bg-indigo-600 transition-colors shadow-sm">
+                                                Mở
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-2 italic">* Chỉ mở trình duyệt cho các tài khoản "❌ Hết phiên / Chưa Login" khi Khởi chạy.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- B3 -->
+                <div v-if="currentStep === 'b3'">
+                    <h2 class="text-2xl font-bold mb-4">B3: Team Management & Trial Activation</h2>
+                    <div class="bg-white p-6 rounded shadow max-w-2xl">
+                        <div class="grid gap-4 mb-4">
+                            <div>
+                                <label class="block text-gray-700 font-bold mb-2">Email Admin (Tài khoản tạo Team)</label>
+                                <input v-model="b3.email" type="text" class="w-full p-2 border rounded" placeholder="admin@maildrop.cc">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-bold mb-2">Tên Team (Tùy chọn)</label>
+                                <input v-model="b3.teamName" type="text" class="w-full p-2 border rounded" placeholder="Dev Team">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-bold mb-2">Team Domain (Tùy chọn)</label>
+                                <input v-model="b3.teamDomain" type="text" class="w-full p-2 border rounded" placeholder="dev-team-xyz">
+                            </div>
+                        </div>
+                        <div class="flex justify-end">
+                            <button @click="runB3" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Tạo Team & Kích hoạt Trial</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- B4 -->
+                <div v-if="currentStep === 'b4'">
+                    <h2 class="text-2xl font-bold mb-4">B4: Batch Join Teams</h2>
+                    <div class="bg-white p-6 rounded shadow max-w-2xl">
+                        <div class="mb-4">
+                            <label class="block text-gray-700 font-bold mb-2">Invite Links (Mỗi dòng 1 link)</label>
+                            <textarea v-model="b4.inviteUrls" rows="3" class="w-full p-2 border rounded font-mono text-sm" placeholder="https://app.postman.com/join-team?invites=...&#10;https://app.postman.com/join-team?invites=..."></textarea>
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 font-bold mb-2">Danh sách Email tham gia (mỗi dòng 1 email)</label>
+                            <textarea v-model="b4.emails" rows="6" class="w-full p-2 border rounded font-mono" placeholder="member1@maildrop.cc&#10;member2@maildrop.cc"></textarea>
+                        </div>
+                        <div class="flex gap-2 flex-wrap">
+                            <button v-if="!isRunningB4" @click="runB4" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Bắt đầu Join</button>
+                            <button v-if="isRunningB4 && !isPausedB4" @click="pauseB4" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">Tạm dừng</button>
+                            <button v-if="isRunningB4 && isPausedB4" @click="resumeB4" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Tiếp tục</button>
+                            <button @click="stopB4" :disabled="!isRunningB4" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 disabled:opacity-50">Hủy</button>
+                        </div>
+                        <p class="text-gray-600 mt-2 italic text-sm">Hệ thống sẽ dùng Concurrency để chạy nhiều luồng cùng lúc.</p>
+                    </div>
+                </div>
+
+                <!-- B6 -->
+                <div v-if="currentStep === 'b6'">
+                    <h2 class="text-2xl font-bold mb-4">B6: Team Cleanup (Delete & Leave)</h2>
+                    <div class="bg-white p-6 rounded shadow max-w-2xl">
+                        <div class="mb-4">
+                            <label class="block text-gray-700 font-bold mb-2">Email cần dọn dẹp</label>
+                            <input v-model="b6.email" type="text" class="w-full p-2 border rounded" placeholder="admin@maildrop.cc">
+                        </div>
+                        <div class="flex justify-end">
+                            <button @click="runB6" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Bắt đầu dọn dẹp Team rác</button>
+                        </div>
+                        <p class="text-gray-600 mt-2 italic text-sm">Lưu ý: Tool sẽ vào phần Settings -> Teams và tự động Leave hoặc Delete các team.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Log Console -->
+            <div class="border-t border-gray-300">
+                <div class="bg-slate-800 text-white px-4 py-2 text-sm font-bold flex justify-between items-center">
+                    <span>Live Console Logs</span>
+                    <button @click="logs = []" class="text-xs bg-slate-600 px-2 py-1 rounded hover:bg-slate-500">Clear</button>
+                </div>
+                <div class="log-container p-2" id="logContainer">
+                    <div v-for="l in logs" class="log-entry">
+                        <span class="text-gray-500">[{{ l.timestamp }}]</span>
+                        <span :class="'font-bold log-tag-' + l.tag">[{{ l.tag }}]</span>
+                        <span>{{ l.message }}</span>
+                        <pre v-if="l.data" class="text-xs mt-1 bg-gray-900 p-2 rounded">{{ JSON.stringify(l.data, null, 2) }}</pre>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    currentStep: 'dashboard',
+                    settings: { browser: 'chrome', concurrency: 6 },
+                    profiles: [],
+                    logs: [],
+                    socket: null,
+                    b1: { count: 10, prefix: 'hunggreen' },
+                    b2: { emails: '', auditList: [] },
+                    isRunningB2: false,
+                    isPausedB2: false,
+                    isScanningB2: false,
+                    b3: { email: '', teamName: '', teamDomain: '' },
+                    b4: { emails: '', inviteUrls: '' },
+                    isRunningB4: false,
+                    isPausedB4: false,
+                    b6: { email: '' }
+                }
+            },
+            mounted() {
+                this.socket = io();
+                this.socket.on('log', (log) => {
+                    this.logs.push({ ...log, timestamp: log.timestamp.split('T')[1].replace('Z', '') });
+                    this.$nextTick(() => {
+                        const el = document.getElementById('logContainer');
+                        el.scrollTop = el.scrollHeight;
+                    });
+                });
+                this.socket.on('b2_audit_result', (data) => {
+                    // Update audit list with result
+                    const p = this.b2.auditList.find(x => x.email === data.email);
+                    if (p) p.status = data.status;
+                });
+                this.socket.on('b2_scan_done', () => {
+                    this.isScanningB2 = false;
+                });
+                this.socket.on('b2_run_done', () => {
+                    this.isRunningB2 = false;
+                    this.isPausedB2 = false;
+                    this.scanProfiles(); // Automatically rescan after running
+                });
+                this.socket.on('b4_run_done', () => {
+                    this.isRunningB4 = false;
+                    this.isPausedB4 = false;
+                });
+                this.fetchSettings();
+                this.loadLocalProfiles();
+            },
+            methods: {
+                async fetchSettings() {
+                    const res = await fetch('/api/settings');
+                    this.settings = await res.json();
+                },
+                async saveSettings() {
+                    await fetch('/api/settings', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(this.settings)
+                    });
+                },
+                async getMergedEmails() {
+                    // Get emails from textarea
+                    const textareaEmails = this.b2.emails.split('\n').map(e => e.trim()).filter(Boolean);
+                    // Get local profiles
+                    const res = await fetch('/api/local-profiles');
+                    const localProfiles = await res.json();
+                    
+                    // Merge and deduplicate
+                    const allEmails = [...new Set([...localProfiles, ...textareaEmails])];
+                    return allEmails;
+                },
+                async loadLocalProfiles() {
+                    const res = await fetch('/api/local-profiles');
+                    const localProfiles = await res.json();
+                    if (localProfiles.length > 0) {
+                        this.b2.auditList = localProfiles.map(e => ({ email: e, status: '➖ Chưa rõ' }));
+                        // Tự động quét khi load app
+                        this.scanProfiles(true);
+                    }
+                },
+                async scanProfiles(isAuto = false) {
+                    const allEmails = await this.getMergedEmails();
+                    if (allEmails.length === 0) {
+                        if (isAuto) return;
+                        return alert('Không có profile nào để quét. Vui lòng thêm email.');
+                    }
+                    
+                    this.isScanningB2 = true;
+                    // Retain old status if it's already there, otherwise CHECKING
+                    this.b2.auditList = allEmails.map(e => {
+                        const existing = this.b2.auditList.find(x => x.email === e);
+                        return { email: e, status: existing && existing.status !== '➖ Chưa rõ' ? existing.status : 'CHECKING' };
+                    });
+                    
+                    await fetch('/api/audit/b2', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ profiles: allEmails })
+                    });
+                },
+                async startBatchLogin() {
+                    const allEmails = await this.getMergedEmails();
+                    if (allEmails.length === 0) return alert('Không có tài khoản nào. Vui lòng nhập email hoặc đợi tạo profile.');
+                    
+                    // Sync audit list with allEmails so the UI shows the new ones
+                    allEmails.forEach(e => {
+                        if (!this.b2.auditList.find(x => x.email === e)) {
+                            this.b2.auditList.push({ email: e, status: '➖ Chưa rõ' });
+                        }
+                    });
+
+                    // Khởi chạy trực tiếp: Filter only EXPIRED or empty status (Chưa rõ)
+                    let targets = this.b2.auditList.filter(p => p.status !== 'OK').map(p => p.email);
+                    
+                    if (targets.length === 0) {
+                        return alert('Tất cả tài khoản đều đã Đã Login (OK). Không có gì để chạy.');
+                    }
+                    
+                    this.isRunningB2 = true;
+                    this.isPausedB2 = false;
+                    this.socket.emit('log', { tag: 'Process', message: `Bắt đầu Batch Login cho ${targets.length} tài khoản...` });
+                    await fetch('/api/run/b2', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ profiles: targets })
+                    });
+                },
+                async openProfile(email) {
+                    await fetch('/api/open-profile/b2', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email })
+                    });
+                },
+                async pauseBatchLogin() {
+                    await fetch('/api/pause/b2', { method: 'POST' });
+                    this.isPausedB2 = true;
+                },
+                async resumeBatchLogin() {
+                    await fetch('/api/resume/b2', { method: 'POST' });
+                    this.isPausedB2 = false;
+                },
+                async stopBatchLogin() {
+                    await fetch('/api/stop/b2', { method: 'POST' });
+                    this.isRunningB2 = false;
+                    this.isPausedB2 = false;
+                },
+                async runB1() {
+                    if (!this.b1.prefix || this.b1.count < 1) return alert('Nhập đầy đủ thông tin');
+                    await fetch('/api/run/b1', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(this.b1)
+                    });
+                },
+                async runB3() {
+                    if (!this.b3.email) return alert('Nhập Email Admin');
+                    await fetch('/api/run/b3', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(this.b3)
+                    });
+                },
+                async runB4() {
+                    const profiles = this.b4.emails.split('\n').map(e => e.trim()).filter(Boolean);
+                    if (profiles.length === 0) return alert('Chưa nhập email');
+                    if (!this.b4.inviteUrls) return alert('Chưa nhập Invite URLs');
+                    
+                    this.isRunningB4 = true;
+                    this.isPausedB4 = false;
+                    
+                    try {
+                        await fetch('/api/run/b4', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ profiles, inviteUrls: this.b4.inviteUrls.replace(/\n/g, '|||') })
+                        });
+                    } catch (e) {
+                        alert('Lỗi: ' + e.message);
+                        this.isRunningB4 = false;
+                    }
+                },
+                async pauseB4() {
+                    await fetch('/api/pause/b4', { method: 'POST' });
+                    this.isPausedB4 = true;
+                },
+                async resumeB4() {
+                    await fetch('/api/resume/b4', { method: 'POST' });
+                    this.isPausedB4 = false;
+                },
+                async stopB4() {
+                    await fetch('/api/stop/b4', { method: 'POST' });
+                    this.isRunningB4 = false;
+                    this.isPausedB4 = false;
+                },
+                async runB6() {
+                    if (!this.b6.email) return alert('Nhập Email Admin cần xoá teams');
+                    await fetch('/api/run/b6', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(this.b6)
+                    });
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

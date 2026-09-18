@@ -1,0 +1,26 @@
+[
+  {
+    "team": "Team 1",
+    "account": "hunggreen0002@maildrop.cc",
+    "success": false,
+    "reason": "failed_or_timeout"
+  },
+  {
+    "team": "Team 1",
+    "account": "hunggreen0003@maildrop.cc",
+    "success": false,
+    "reason": "failed_or_timeout"
+  },
+  {
+    "team": "Team 1",
+    "account": "hunggreen0004@maildrop.cc",
+    "success": false,
+    "reason": "failed_or_timeout"
+  },
+  {
+    "team": "Team 1",
+    "account": "hunggreen0005@maildrop.cc",
+    "success": false,
+    "reason": "failed_or_timeout"
+  }
+]
